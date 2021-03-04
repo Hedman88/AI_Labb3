@@ -25,14 +25,14 @@ class PathFinder:
                     self.visited.append(neighbourBlock)
                     bfsQ.append(neighbourBlock)
                     neighbourBlock.prevBlockID = s.id
-                    if (neighbourBlock.isGoal):
+                    if (neighbourBlock.hasTrees):
                         self.path.append(neighbourBlock)
                         prevID = neighbourBlock.prevBlockID
                         while (prevID != 0):
                             prevBlock = paths.GetBlockByID(prevID)
                             self.path.append(prevBlock)
                             prevID = prevBlock.prevBlockID
-                        return
+                        return self.path
             # gui.Clear()
             # gui.DrawVisited(self.visited)
             # gui.Update()
@@ -141,6 +141,12 @@ class PathBlock:
 
     def GetPrevBlock(self):
         return paths.GetBlockByID(self.prevBlockID)
+
+    def RemoveTree(self):
+        if(self.hasTrees):
+            self.trees -= 1
+            if(self.trees <= 0):
+                self.hasTrees = False
 
 
 class Paths:

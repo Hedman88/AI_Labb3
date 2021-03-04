@@ -27,22 +27,38 @@ def InitMapBlocks():
             neighbours = []
             if (maprows[i][j] == "B" or maprows[i][j] == "V"):
                 continue
+
             # Appending all relevant IDs to current block
-            if (maprows[i - 1][j] != "B" or maprows[i - 1][j] != "V"):
+            if (maprows[i - 1][j] != "B" and maprows[i - 1][j] != "V"):
                 neighbours.append(N)
-            if (maprows[i - 1][j + 1] != "B" or maprows[i - 1][j + 1] != "V") and (maprows[i - 1][j] != "B" or maprows[i - 1][j] != "V") and (maprows[i][j + 1] != "B" or maprows[i][j + 1] != "V"):
+
+            if (maprows[i - 1][j + 1] != "B" and maprows[i - 1][j + 1] != "V") and \
+                    (maprows[i - 1][j] != "B" and maprows[i - 1][j] != "V") and \
+                    (maprows[i][j + 1] != "B" and maprows[i][j + 1] != "V"):
                 neighbours.append(NE)
-            if (maprows[i][j + 1] != "B" or maprows[i][j + 1] != "V"):
+
+            if (maprows[i][j + 1] != "B" and maprows[i][j + 1] != "V"):
                 neighbours.append(E)
-            if (maprows[i + 1][j + 1] != "B" or maprows[i + 1][j + 1] != "V") and (maprows[i][j + 1] != "B" or maprows[i][j + 1] != "V") and (maprows[i + 1][j] != "B" or maprows[i + 1][j] != "V"):
+
+            if (maprows[i + 1][j + 1] != "B" and maprows[i + 1][j + 1] != "V") and \
+                    (maprows[i][j + 1] != "B" and maprows[i][j + 1] != "V") and \
+                    (maprows[i + 1][j] != "B" and maprows[i + 1][j] != "V"):
                 neighbours.append(SE)
-            if (maprows[i + 1][j] != "B" or maprows[i + 1][j] != "V"):
+
+            if (maprows[i + 1][j] != "B" and maprows[i + 1][j] != "V"):
                 neighbours.append(S)
-            if (maprows[i + 1][j - 1] != "B" or maprows[i + 1][j - 1] != "V") and (maprows[i + 1][j] != "B" or maprows[i + 1][j] != "V") and (maprows[i][j - 1] != "B" or maprows[i][j - 1] != "V"):
+
+            if (maprows[i + 1][j - 1] != "B" and maprows[i + 1][j - 1] != "V") and \
+                    (maprows[i + 1][j] != "B" and maprows[i + 1][j] != "V") and \
+                    (maprows[i][j - 1] != "B" and maprows[i][j - 1] != "V"):
                 neighbours.append(SW)
-            if (maprows[i][j - 1] != "B" or maprows[i][j - 1] != "V"):
+
+            if (maprows[i][j - 1] != "B" and maprows[i][j - 1] != "V"):
                 neighbours.append(W)
-            if (maprows[i - 1][j - 1] != "B" or maprows[i - 1][j - 1] != "V") and (maprows[i][j - 1] != "B" or maprows[i][j - 1] != "V") and (maprows[i - 1][j] != "B" or maprows[i - 1][j] != "V"):
+
+            if (maprows[i - 1][j - 1] != "B" and maprows[i - 1][j - 1] != "V") and \
+                    (maprows[i][j - 1] != "B" and maprows[i][j - 1] != "V") and \
+                    (maprows[i - 1][j] != "B" and maprows[i - 1][j] != "V"):
                 neighbours.append(NW)
 
             # Mark
