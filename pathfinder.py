@@ -1,19 +1,22 @@
 import pygamegui as gui
-import time, math
+import time, math, random
 
 
 class PathFinder:
     goalFound = False
     visited = []
     path = []
+    backtrack = {}
 
     # Resets all values so the next run wont be affected by the previous one
     def Reset(self):
         self.visited = []
         self.path = []
+        self.backtrack = {}
         self.goalFound = False
 
     def bfs(self, startBlock):
+        self.backtrack[startBlock.id] = 0
         self.visited.append(startBlock)
         bfsQ = []
         bfsQ.append(startBlock)
@@ -24,21 +27,25 @@ class PathFinder:
                 if neighbourBlock not in self.visited:
                     self.visited.append(neighbourBlock)
                     bfsQ.append(neighbourBlock)
-                    neighbourBlock.prevBlockID = s.id
+                    self.backtrack[neighbourBlock.id] = s.id
+                    # neighbourBlock.prevBlockID = s.id
                     if (neighbourBlock.hasTrees):
                         self.path.append(neighbourBlock)
-                        prevID = neighbourBlock.prevBlockID
+                        prevID = self.backtrack.get(neighbourBlock.id)
+                        #prevID = neighbourBlock.prevBlockID
                         while (prevID != 0):
                             prevBlock = paths.GetBlockByID(prevID)
                             self.path.append(prevBlock)
-                            prevID = prevBlock.prevBlockID
+                            prevID = self.backtrack.get(prevBlock.id)
+                            #prevID = prevBlock.prevBlockID
                         return self.path
             # gui.Clear()
             # gui.DrawVisited(self.visited)
             # gui.Update()
             # time.sleep(0.01)
 
-    def AStar(self, startBlock):
+    def AStar(self, startBlock, goalBlock):
+        self.backtrack[startBlock.id] = 0
         openList = []
         closedList = []
         openList.append(startBlock)
@@ -55,23 +62,25 @@ class PathFinder:
                 skip = False
                 neighbourBlock = paths.GetBlockByID(neighbourID)
 
-                if (neighbourBlock.isGoal):
+                if (neighbourBlock == goalBlock):
                     self.path.append(neighbourBlock)
-                    prevID = q.prevBlockID
+                    prevID = self.backtrack.get(q.id)
+                    #prevID = q.prevBlockID
                     while (prevID != 0):
                         prevBlock = paths.GetBlockByID(prevID)
                         self.path.append(prevBlock)
-                        prevID = prevBlock.prevBlockID
-                    return
+                        prevID = self.backtrack.get(prevBlock.id)
+                        #prevID = prevBlock.prevBlockID
+                    return self.path
                 if (neighbourBlock.id % 100 != q.id % 100 and neighbourBlock.id / 100 != q.id / 100):
-                    neighbourBlock.g = 1.4
+                    #neighbourBlock.g = 1.4
                     # Byt till denna undre rad för fullständig A*
-                    # neighbourBlock.g = q.g + 1.4
+                    neighbourBlock.g = q.g + 1.4
                 else:
-                    neighbourBlock.g = 1
+                    #neighbourBlock.g = 1
                     # Byt till denna undre rad för fullständig A*
-                    # neighbourBlock.g = q.g + 1
-                neighbourBlock.h = self.Diagonal(neighbourID)
+                    neighbourBlock.g = q.g + 1
+                neighbourBlock.h = self.Euclidean(neighbourID, goalBlock)
                 neighbourBlock.f = neighbourBlock.g + neighbourBlock.h
                 for i in openList:
                     if (i.id == neighbourBlock.id and neighbourBlock.f >= i.f):
@@ -81,7 +90,8 @@ class PathFinder:
                         skip = True
                 if skip is False:
                     # set q as parent to all neighbour blocks
-                    neighbourBlock.prevBlockID = q.id
+                    self.backtrack[neighbourBlock.id] = q.id
+                    #neighbourBlock.prevBlockID = q.id
                     openList.append(neighbourBlock)
             closedList.append(q)
             # gui.Clear()
@@ -90,34 +100,31 @@ class PathFinder:
             # time.sleep(0.01)
 
     # Following are different heuristics for testing purposes
-    def Manhattan(self, currentID):
+    def Manhattan(self, currentID, goal):
         xCur = currentID % 100
         yCur = currentID / 100
         # Converting ID to coordinates
-        goalID = paths.GetGoal().id
-        xGoal = goalID % 100
-        yGoal = goalID / 100
+        xGoal = goal.id % 100
+        yGoal = goal.id / 100
         h = abs(xCur - xGoal) + abs(yCur - yGoal)
         return h
 
-    def Diagonal(self, currentID):
+    def Diagonal(self, currentID, goal):
         xCur = currentID % 100
         yCur = currentID / 100
         # Converting ID to coordinates
-        goalID = paths.GetGoal().id
-        xGoal = goalID % 100
-        yGoal = goalID / 100
+        xGoal = goal.id % 100
+        yGoal = goal.id / 100
         # Diagonal Distance Heuristics
         h = max([abs(xCur - xGoal), abs(yCur - yGoal)])
         return h
 
-    def Euclidean(self, currentID):
+    def Euclidean(self, currentID, goal):
         xCur = currentID % 100
         yCur = currentID / 100
         # Converting ID to coordinates
-        goalID = paths.GetGoal().id
-        xGoal = goalID % 100
-        yGoal = goalID / 100
+        xGoal = goal.id % 100
+        yGoal = goal.id / 100
 
         h = math.sqrt((xCur - xGoal) ** 2 + (yCur - yGoal) ** 2)
         return h
@@ -130,6 +137,8 @@ class PathBlock:
     h = 0.0
     f = 0.0
 
+    woodPile = 0
+    hasWood = False
     isFogged = True
     def __init__(self, ID, adjacents, ms, hasTrees):
         self.id = ID
@@ -138,6 +147,11 @@ class PathBlock:
         self.hasTrees = hasTrees
         if(self.hasTrees):
             self.trees = 5
+
+    def IdToCoordinates(self):
+        x = int(self.id % 100)
+        y = int(self.id / 100)
+        return (x,y)
 
     def GetPrevBlock(self):
         return paths.GetBlockByID(self.prevBlockID)
@@ -148,6 +162,19 @@ class PathBlock:
             if(self.trees <= 0):
                 self.hasTrees = False
 
+    def DropWood(self):
+        if self.hasWood == False:
+            self.hasWood = True
+        self.woodPile += 1
+        print(self.id, "GOT WOOD")
+
+    def TakeWood(self):
+        if self.hasWood:
+            self.woodPile -= 1
+            if self.woodPile == 0:
+                self.hasWood = False
+        else:
+            print("This tile has no wood!!!")
 
 class Paths:
     pathBlocks = {}
@@ -161,6 +188,9 @@ class Paths:
     def GetBlockByID(self, ID):
         return self.pathBlocks.get(ID)
 
+    def GetRandomBlock(self):
+        r = random.choice(list(self.pathBlocks.values()))
+        return r
 
 paths = Paths()
 pf = PathFinder()

@@ -1,11 +1,15 @@
-import agent, fsm
+import agent, fsm, pathfinder
 
 class Overlord:
     agents = []
 
     def SpawnAgents(self):
-        for i in range(1):
-            self.agents.append(agent.Agent(i, (41,49)))
+        self.agents.append(agent.Agent(0, (41, 49)))
+        hubBlock = self.agents[0].hubBlock
+        for i in range(49):
+            rBlock = pathfinder.paths.GetRandomBlock()
+            self.agents.append(agent.Agent(i+1, rBlock.IdToCoordinates()))
+            self.agents[i+1].SetHubBlock(hubBlock)
 
     def UpdateAgents(self):
         for i in range(len(self.agents)):

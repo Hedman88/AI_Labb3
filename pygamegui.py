@@ -20,6 +20,10 @@ def StartPygame():
     global rectSize
     rectSize = displaySize / (len(maprows[0]) - 1)
 
+    global treeRand
+    treeRand = []
+    for i in range(5):
+        treeRand.append(random.randrange(3))
 
 def DrawMap():
     for i in range(len(maprows)):
@@ -33,9 +37,9 @@ def DrawMap():
             if(maprows[i][j] == "M"):
                 pygame.draw.rect(display, (50,150,50), (j*rectSize, i*rectSize, rectSize, rectSize))
                 continue
-            # if(maprows[i][j] == "T"):
-            #     pygame.draw.rect(display, (0,50,0), (j*rectSize, i*rectSize, rectSize, rectSize))
-            #     continue
+            if(maprows[i][j] == "T"):
+                pygame.draw.rect(display, (50,150,50), (j*rectSize, i*rectSize, rectSize, rectSize))
+                continue
             if(maprows[i][j] == "G"):
                 pygame.draw.rect(display, (101,67,33), (j*rectSize, i*rectSize, rectSize, rectSize))
                 continue
@@ -47,7 +51,9 @@ def DrawBlocks():
         if(b.hasTrees):
             pygame.draw.rect(display, (0, 50, 0), ((b.id%100) * rectSize, int(b.id/100) * rectSize, rectSize, rectSize))
             for i in range(b.trees):
-                pygame.draw.rect(display, (101, 67, 33), ((b.id % 100) * rectSize + 2*i, int(b.id / 100) * rectSize + 2*i, 2, 2))
+                pygame.draw.rect(display, (101, 67, 33), ((b.id % 100) * rectSize + treeRand[i]*i, int(b.id / 100) * rectSize + 2*i, 2, 2))
+        if b.hasWood:
+            pygame.draw.rect(display, (101, 67, 33), ((b.id % 100) * rectSize + 5, int(b.id / 100) * rectSize + 5, 2, 2))
 
 def DrawPath(path):
     for i in range(len(path)-1):
