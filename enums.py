@@ -17,4 +17,6 @@ class AgentType(Enum):
 
 class GoalEnum(Enum):
     WOOD_GOAL = 0
-    #F
+    DISCOVER_GOAL = 1
+    KILN_GOAL = 2
+    BUILD_KILNS_GOAL = 3

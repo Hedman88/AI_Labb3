@@ -192,5 +192,13 @@ class Paths:
         r = random.choice(list(self.pathBlocks.values()))
         return r
 
+    def GetNthBlock(self, n):
+        if n < 0:
+            n += len(self.pathBlocks)
+        for i, block in enumerate(self.pathBlocks.values()):
+            if i == n:
+                return block
+        raise IndexError("dictionary index out of range")
+
 paths = Paths()
 pf = PathFinder()

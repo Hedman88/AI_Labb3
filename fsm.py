@@ -57,4 +57,16 @@ class UpgradeState:
     def __init__(self, upgradeType):
         self.upgradeType = upgradeType
 
-    #def Execute(self, agent):
+    def Execute(self, agent):
+        if agent.upgradeTimer > 0:
+            agent.upgradeTimer -= 1
+        else:
+            agent.type = self.upgradeType
+            agent.ChangeState(IdleState())
+            print("Upgrade complete!", agent.ID, "is now a", agent.type)
+
+class ExploreState:
+    def Execute(self, agent):
+        if agent.type != enums.AgentType.DISCOVERER:
+            print(agent.ID, "is not a discoverer!!!")
+            agent.ChangeState(IdleState())

@@ -20,21 +20,22 @@ class Agent:
     def Update(self):
         self.state.Execute(self)
 
+    def SetGoal(self, newGoal):
+        self.goal = newGoal
+
     def SetHubBlock(self, hubBlock):
         self.hubBlock = hubBlock
 
     def Upgrade(self, newType):
         if(newType == enums.AgentType.DISCOVERER):
             self.UpgradeTimer = 60
-            self.type = newType
         elif(newType == enums.AgentType.SOLDIER):
             # Check for weapon
-            # 60 second timer
-            self.type = newType
+            self.UpgradeTimer = 60
         else:
             # Alla hantverkare här
             self.UpgradeTimer = 120
-            self.type = newType
+        self.ChangeState(fsm.UpgradeState())
 
     def SetType(self, newType):
         self.type = newType

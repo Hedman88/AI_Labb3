@@ -1,15 +1,24 @@
-import agent, fsm, pathfinder
+import agent, fsm, pathfinder, enums, random
 
 class Overlord:
     agents = []
 
     def SpawnAgents(self):
-        self.agents.append(agent.Agent(0, (41, 49)))
-        hubBlock = self.agents[0].hubBlock
-        for i in range(49):
-            rBlock = pathfinder.paths.GetRandomBlock()
-            self.agents.append(agent.Agent(i+1, rBlock.IdToCoordinates()))
-            self.agents[i+1].SetHubBlock(hubBlock)
+        maxAgents = 50
+        print(len(pathfinder.paths.pathBlocks))
+        startBlock = pathfinder.paths.GetNthBlock(random.randrange(9163))
+        for i in range(maxAgents):
+            for j in range(len(startBlock.adjacents)):
+                rBlock = pathfinder.paths.GetBlockByID(startBlock.adjacents[i])
+                self.agents.append(agent.Agent(i, rBlock.IdToCoordinates()))
+                self.agents[j].SetHubBlock(startBlock)
+
+        for i in range(len(startBlock.adjacents)):
+            rBlock = pathfinder.paths.GetBlockByID(startBlock.adjacents[i])
+            for j in range(50):
+                self.agents.append(agent.Agent(j, rBlock.IdToCoordinates()))
+                self.agents[j].SetHubBlock(startBlock)
+
 
     def UpdateAgents(self):
         for i in range(len(self.agents)):
@@ -21,5 +30,15 @@ class Overlord:
                 self.agents[i].FindWood()
                 self.agents[i].ChangeState(fsm.MoveState())
 
+    def OperationCharcoal(self, nrDisc, nrKiln, nrBuild):
+        for i in range(len(self.agents)):
+            if i < nrDisc:
+                self.agents[i].SetGoal(enums.GoalEnum.DISCOVER_GOAL)
+            if i < nrDisc + nrKiln:
+                self.agents[i].SetGoal(enums.GoalEnum.KILN_GOAL)
+            if i < nrDisc + nrKiln + nrBuild:
+                self.agents[i].SetGoal(enums.GoalEnum.BUILD_KILNS_GOAL)
+            else:
+                return
 
 overlord = Overlord()
