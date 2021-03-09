@@ -2,6 +2,7 @@ import enums
 
 class IdleState:
     def Execute(self, agent):
+        agent.FindTask()
         return
 
 class MoveState:
@@ -60,6 +61,8 @@ class UpgradeState:
     def Execute(self, agent):
         if agent.upgradeTimer > 0:
             agent.upgradeTimer -= 1
+            if agent.upgradeTimer%5 == 0:
+                print(agent.woodChopTimer)
         else:
             agent.type = self.upgradeType
             agent.ChangeState(IdleState())
@@ -70,3 +73,5 @@ class ExploreState:
         if agent.type != enums.AgentType.DISCOVERER:
             print(agent.ID, "is not a discoverer!!!")
             agent.ChangeState(IdleState())
+        agent.Move(agent.GetTouchingBlock().ms, 1, 1)
+        agent.DiscoverTiles()

@@ -26,6 +26,8 @@ def InitMapBlocks():
             # SE, S, E, N, NW, W, SW, NE best order?
             neighbours = []
             if (maprows[i][j] == "B" or maprows[i][j] == "V"):
+                block = pathfinder.PathBlock(selfID, -1, 0, False, False)
+                pathfinder.paths.unwalkables[selfID] = block
                 continue
 
             # Appending all relevant IDs to current block
@@ -63,11 +65,11 @@ def InitMapBlocks():
 
             # Mark
             if (maprows[i][j] == "M"):
-                pathfinder.paths.pathBlocks[selfID] = pathfinder.PathBlock(selfID, neighbours, 1, False)
+                pathfinder.paths.pathBlocks[selfID] = pathfinder.PathBlock(selfID, neighbours, 1, False, True)
             # Sumpmark
             if(maprows[i][j] == "G"):
-                pathfinder.paths.pathBlocks[selfID] = pathfinder.PathBlock(selfID, neighbours, 0.5, False)
+                pathfinder.paths.pathBlocks[selfID] = pathfinder.PathBlock(selfID, neighbours, 0.5, False, True)
             # Träd
             if (maprows[i][j] == "T"):
-                block = pathfinder.PathBlock(selfID, neighbours, 0.5, True)
+                block = pathfinder.PathBlock(selfID, neighbours, 0.5, True, True)
                 pathfinder.paths.pathBlocks[selfID] = block

@@ -1,4 +1,4 @@
-import pygame, sys, mapreader, overlord, pathfinder, random
+import pygame, sys, mapreader, overlord, pathfinder, random, enums
 from pygame.locals import *
 
 def StartPygame():
@@ -41,11 +41,18 @@ def DrawMap():
                 pygame.draw.rect(display, (50,150,50), (j*rectSize, i*rectSize, rectSize, rectSize))
                 continue
             if(maprows[i][j] == "G"):
-                pygame.draw.rect(display, (101,67,33), (j*rectSize, i*rectSize, rectSize, rectSize))
+                pygame.draw.rect(display, (101,67,83), (j*rectSize, i*rectSize, rectSize, rectSize))
                 continue
 
 def DrawBlocks():
     blocks = pathfinder.paths.pathBlocks
+    unwalkables = pathfinder.paths.unwalkables
+    for key in unwalkables:
+        b = unwalkables[key]
+        if b.isFogged:
+            pygame.draw.rect(display, (200, 200, 200),
+                             ((b.id % 100) * rectSize, int(b.id / 100) * rectSize, rectSize, rectSize))
+
     for key in blocks:
         b = blocks[key]
         if(b.hasTrees):
@@ -53,7 +60,17 @@ def DrawBlocks():
             for i in range(b.trees):
                 pygame.draw.rect(display, (101, 67, 33), ((b.id % 100) * rectSize + treeRand[i]*i, int(b.id / 100) * rectSize + 2*i, 2, 2))
         if b.hasWood:
-            pygame.draw.rect(display, (101, 67, 33), ((b.id % 100) * rectSize + 5, int(b.id / 100) * rectSize + 5, 2, 2))
+            if b.woodPile > 100:
+                pygame.draw.rect(display, (101, 67, 33),
+                                 ((b.id % 100) * rectSize + 5, int(b.id / 100) * rectSize + 5, 8, 4))
+            elif b.woodPile > 25:
+                pygame.draw.rect(display, (101, 67, 33),
+                                 ((b.id % 100) * rectSize + 5, int(b.id / 100) * rectSize + 5, 4, 2))
+            else:
+                pygame.draw.rect(display, (101, 67, 33), ((b.id % 100) * rectSize + 5, int(b.id / 100) * rectSize + 5, 2, 1))
+        if b.isFogged:
+            pygame.draw.rect(display, (200, 200, 200),
+                             ((b.id % 100) * rectSize, int(b.id / 100) * rectSize, rectSize, rectSize))
 
 def DrawPath(path):
     for i in range(len(path)-1):
@@ -64,7 +81,14 @@ def DrawPath(path):
 def DrawAgents(agents):
     for i in range(len(agents)):
         point = (agents[i].posX, agents[i].posY)
-        pygame.draw.rect(display, (255,0,0), (agents[i].posX, agents[i].posY, 3, 3))
+        if agents[i].type == enums.AgentType.WORKER:
+            pygame.draw.rect(display, (255,0,0), (agents[i].posX, agents[i].posY, 3, 3))
+        if agents[i].type == enums.AgentType.DISCOVERER:
+            pygame.draw.rect(display, (0, 255, 255), (agents[i].posX, agents[i].posY, 3, 3))
+        if agents[i].type == enums.AgentType.KILNER:
+            pygame.draw.rect(display, (0, 0, 0), (agents[i].posX, agents[i].posY, 3, 3))
+        if agents[i].type == enums.AgentType.BUILDER:
+            pygame.draw.rect(display, (255, 255, 255), (agents[i].posX, agents[i].posY, 3, 3))
 
 def Clear():
     display.fill((255,255,255))

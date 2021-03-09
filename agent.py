@@ -15,7 +15,7 @@ class Agent:
         self.state = fsm.IdleState()
         self.goal = enums.GoalEnum.WOOD_GOAL
         self.woodChopTimer = 30
-        self.UpgradeTimer = 0
+        self.upgradeTimer = 0
 
     def Update(self):
         self.state.Execute(self)
@@ -28,14 +28,19 @@ class Agent:
 
     def Upgrade(self, newType):
         if(newType == enums.AgentType.DISCOVERER):
-            self.UpgradeTimer = 60
+            self.upgradeTimer = 60
+            self.ChangeState(fsm.UpgradeState(enums.AgentType.DISCOVERER))
         elif(newType == enums.AgentType.SOLDIER):
             # Check for weapon
-            self.UpgradeTimer = 60
-        else:
+            self.upgradeTimer = 60
+            # self.ChangeState(fsm.UpgradeState())
+        elif(newType == enums.AgentType.KILNER):
             # Alla hantverkare här
-            self.UpgradeTimer = 120
-        self.ChangeState(fsm.UpgradeState())
+            self.upgradeTimer = 120
+            # self.ChangeState(fsm.UpgradeState(enums.AgentType.KILNER))
+        elif(newType == enums.AgentType.BUILDER):
+            self.upgradeTimer = 120
+            # self.ChangeState(fsm.UpgradeState(enums.AgentType.BUILDER))
 
     def SetType(self, newType):
         self.type = newType
@@ -68,16 +73,69 @@ class Agent:
             self.GetTouchingBlock().DropWood()
             self.holding = enums.ItemEnum.NONE
 
+    def FindTask(self):
+        # if self.type == enums.AgentType.WORKER:
+        #     if self.goal == enums.GoalEnum.WOOD_GOAL:
+        #         self.FindWood()
+        #         self.ChangeState(fsm.MoveState())
+        #         return
+        if self.goal == enums.GoalEnum.DISCOVER_GOAL:
+            if self.type != enums.AgentType.DISCOVERER:
+                self.Upgrade(enums.AgentType.DISCOVERER)
+                return
+            else:
+                self.ChangeState(fsm.ExploreState())
+                return
+
+        if self.goal == enums.GoalEnum.KILN_GOAL:
+            if self.type != enums.AgentType.KILNER:
+                self.Upgrade(enums.AgentType.KILNER)
+                return
+            else:
+                #self.ChangeState(fsm.KilnState())
+                return
+
+        if self.goal == enums.GoalEnum.BUILD_KILNS_GOAL:
+            if self.type != enums.AgentType.BUILDER:
+                self.Upgrade(enums.AgentType.BUILDER)
+                return
+            else:
+                #self.ChangeState(fsm.BuildState(enums.Building.KILN))
+                return
+
     def FindWood(self):
         self.pathBack = []
         self.path = []
         pathfinder.pf.Reset()
         self.path = pathfinder.pf.bfs(self.GetTouchingBlock())
 
+    def DiscoverTiles(self):
+        if self.type != enums.AgentType.DISCOVERER:
+            print("This unit is not a discoverer!!!")
+            return
+        b = self.GetTouchingBlock()
+        for nID in b.adjacents:
+            pathfinder.paths.GetBlockByID(nID).Discover()
+        bNeighbours = []
+        bCoords = b.IdToCoordinates()
+        bNeighbours.append((bCoords[1] - 1) * 100 + bCoords[0])         #N
+        bNeighbours.append((bCoords[1] - 1) * 100 + bCoords[0] + 1)     #NE
+        bNeighbours.append(bCoords[1] * 100 + bCoords[0] + 1)           #E
+        bNeighbours.append((bCoords[1] + 1) * 100 + bCoords[0] + 1)     #SE
+        bNeighbours.append((bCoords[1] + 1) * 100 + bCoords[0])         #S
+        bNeighbours.append((bCoords[1] + 1) * 100 + bCoords[0] - 1)     #SW
+        bNeighbours.append(bCoords[1] * 100 + bCoords[0] - 1)           #W
+        bNeighbours.append((bCoords[1] - 1) * 100 + bCoords[0] - 1)     #NW
+        for nID in bNeighbours:
+            b = pathfinder.paths.GetUnwalkableByID(nID)
+            if b != None:
+                b.Discover()
+
     def SetReturnPath(self):
-        # self.path = pathfinder.pf.AStar(self.GetTouchingBlock(), self.hubBlock)
-        self.path = self.pathBack
-        self.pathBack = []
+        pathfinder.pf.Reset()
+        self.path = pathfinder.pf.AStar(self.GetTouchingBlock(), self.hubBlock)
+        #self.path = self.pathBack
+        #self.pathBack = []
         print("return path set")
 
     def GetTouchingBlock(self):

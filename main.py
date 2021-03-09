@@ -8,7 +8,8 @@ mapreader.InitMapBlocks()
 gui.Update()
 
 overlord.overlord.SpawnAgents()
-overlord.overlord.GetWood()
+#overlord.overlord.GetWood()
+overlord.overlord.OperationCharcoal(10, 4, 1)
 while True:
     overlord.overlord.UpdateAgents()
     gui.Update()

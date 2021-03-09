@@ -140,13 +140,14 @@ class PathBlock:
     woodPile = 0
     hasWood = False
     isFogged = True
-    def __init__(self, ID, adjacents, ms, hasTrees):
+    def __init__(self, ID, adjacents, ms, hasTrees, walkable):
         self.id = ID
         self.adjacents = adjacents
         self.ms = ms  # 1 for mark and 0.5 for trees and sumpmark
         self.hasTrees = hasTrees
         if(self.hasTrees):
             self.trees = 5
+        self.walkable = walkable
 
     def IdToCoordinates(self):
         x = int(self.id % 100)
@@ -155,6 +156,10 @@ class PathBlock:
 
     def GetPrevBlock(self):
         return paths.GetBlockByID(self.prevBlockID)
+
+    def Discover(self):
+        if self.isFogged:
+            self.isFogged = False
 
     def RemoveTree(self):
         if(self.hasTrees):
@@ -178,6 +183,7 @@ class PathBlock:
 
 class Paths:
     pathBlocks = {}
+    unwalkables = {}
 
     def GetStart(self):
         return self.pathBlocks.get("start")
@@ -187,6 +193,9 @@ class Paths:
 
     def GetBlockByID(self, ID):
         return self.pathBlocks.get(ID)
+
+    def GetUnwalkableByID(self, ID):
+        return self.unwalkables.get(ID)
 
     def GetRandomBlock(self):
         r = random.choice(list(self.pathBlocks.values()))
