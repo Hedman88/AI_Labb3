@@ -20,3 +20,9 @@ class GoalEnum(Enum):
     DISCOVER_GOAL = 1
     KILN_GOAL = 2
     BUILD_KILNS_GOAL = 3
+
+class BuildingType(Enum):
+    KILN_BUILDING = 0
+    SMITHY_BUILDING = 1
+    SMELTER_BUILDING = 2
+    BOOTCAMP_BUILDING = 3

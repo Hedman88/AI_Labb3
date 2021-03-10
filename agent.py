@@ -14,8 +14,9 @@ class Agent:
         self.pathBack = []
         self.state = fsm.IdleState()
         self.goal = enums.GoalEnum.WOOD_GOAL
-        self.woodChopTimer = 30
+        self.workTimer = 30
         self.upgradeTimer = 0
+        self.workPlace = 0
 
     def Update(self):
         self.state.Execute(self)
@@ -25,6 +26,12 @@ class Agent:
 
     def SetHubBlock(self, hubBlock):
         self.hubBlock = hubBlock
+
+    def AddWorkPlace(self, workPlace):
+        if self.workPlace == 0:
+            self.workPlace = workPlace
+        else:
+            print(self.ID, "already has a workplace at", self.workPlace)
 
     def Upgrade(self, newType):
         if(newType == enums.AgentType.DISCOVERER):
@@ -37,10 +44,10 @@ class Agent:
         elif(newType == enums.AgentType.KILNER):
             # Alla hantverkare här
             self.upgradeTimer = 120
-            # self.ChangeState(fsm.UpgradeState(enums.AgentType.KILNER))
+            self.ChangeState(fsm.UpgradeState(enums.AgentType.KILNER))
         elif(newType == enums.AgentType.BUILDER):
             self.upgradeTimer = 120
-            # self.ChangeState(fsm.UpgradeState(enums.AgentType.BUILDER))
+            self.ChangeState(fsm.UpgradeState(enums.AgentType.BUILDER))
 
     def SetType(self, newType):
         self.type = newType
@@ -74,11 +81,10 @@ class Agent:
             self.holding = enums.ItemEnum.NONE
 
     def FindTask(self):
-        # if self.type == enums.AgentType.WORKER:
-        #     if self.goal == enums.GoalEnum.WOOD_GOAL:
-        #         self.FindWood()
-        #         self.ChangeState(fsm.MoveState())
-        #         return
+        if self.type == enums.AgentType.WORKER:
+            if self.goal == enums.GoalEnum.WOOD_GOAL:
+                self.FindWood()
+                return
         if self.goal == enums.GoalEnum.DISCOVER_GOAL:
             if self.type != enums.AgentType.DISCOVERER:
                 self.Upgrade(enums.AgentType.DISCOVERER)
@@ -92,22 +98,36 @@ class Agent:
                 self.Upgrade(enums.AgentType.KILNER)
                 return
             else:
-                #self.ChangeState(fsm.KilnState())
-                return
+                b = self.GetTouchingBlock()
+                if b is not self.hubBlock:
+                    self.SetReturnPath()
+                    return
+                else:
+                    self.ChangeState(fsm.RunKilnState())
 
         if self.goal == enums.GoalEnum.BUILD_KILNS_GOAL:
             if self.type != enums.AgentType.BUILDER:
                 self.Upgrade(enums.AgentType.BUILDER)
                 return
             else:
-                #self.ChangeState(fsm.BuildState(enums.Building.KILN))
-                return
+                b = self.GetTouchingBlock()
+                if b is not self.hubBlock:
+                    self.SetReturnPath()
+                    return
+                if b.woodPile >= 10 and len(b.kilns) < 4:
+                    self.Build(enums.BuildingType.KILN_BUILDING)
+                else:
+                    self.ChangeState(fsm.IdleState())
 
     def FindWood(self):
         self.pathBack = []
         self.path = []
         pathfinder.pf.Reset()
         self.path = pathfinder.pf.bfs(self.GetTouchingBlock())
+        if self.path == None:
+            #print("No trees in sight")
+            return
+        self.ChangeState(fsm.MoveState())
 
     def DiscoverTiles(self):
         if self.type != enums.AgentType.DISCOVERER:
@@ -131,11 +151,20 @@ class Agent:
             if b != None:
                 b.Discover()
 
+    def Build(self, buildingType):
+        if buildingType == enums.BuildingType.KILN_BUILDING:
+            self.workTimer = 60
+        self.ChangeState(fsm.BuildState(buildingType))
+
     def SetReturnPath(self):
         pathfinder.pf.Reset()
         self.path = pathfinder.pf.AStar(self.GetTouchingBlock(), self.hubBlock)
         #self.path = self.pathBack
         #self.pathBack = []
+        if self.path == None:
+            print("Return path obstructed???")
+            return
+        self.ChangeState(fsm.MoveState())
         print("return path set")
 
     def GetTouchingBlock(self):

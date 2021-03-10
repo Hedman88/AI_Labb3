@@ -60,7 +60,10 @@ def DrawBlocks():
             for i in range(b.trees):
                 pygame.draw.rect(display, (101, 67, 33), ((b.id % 100) * rectSize + treeRand[i]*i, int(b.id / 100) * rectSize + 2*i, 2, 2))
         if b.hasWood:
-            if b.woodPile > 100:
+            if b.woodPile > 400:
+                pygame.draw.rect(display, (101, 67, 33),
+                                 ((b.id % 100) * rectSize + 5, int(b.id / 100) * rectSize + 5, 16, 8))
+            elif b.woodPile > 100:
                 pygame.draw.rect(display, (101, 67, 33),
                                  ((b.id % 100) * rectSize + 5, int(b.id / 100) * rectSize + 5, 8, 4))
             elif b.woodPile > 25:

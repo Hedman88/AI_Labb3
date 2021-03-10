@@ -2,6 +2,7 @@ import agent, fsm, pathfinder, enums, random
 
 class Overlord:
     agents = []
+    charcoal = 0
 
     def SpawnAgents(self):
         maxAgents = 50
@@ -44,5 +45,8 @@ class Overlord:
                 self.agents[i].SetGoal(enums.GoalEnum.BUILD_KILNS_GOAL)
             else:
                 return
+
+    def AddCharcoal(self):
+        self.charcoal += 1
 
 overlord = Overlord()

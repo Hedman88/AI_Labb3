@@ -24,7 +24,7 @@ class PathFinder:
             s = bfsQ.pop(0)
             for neighbour in s.adjacents:
                 neighbourBlock = paths.GetBlockByID(neighbour)
-                if neighbourBlock not in self.visited:
+                if neighbourBlock not in self.visited and neighbourBlock.isFogged is False:
                     self.visited.append(neighbourBlock)
                     bfsQ.append(neighbourBlock)
                     self.backtrack[neighbourBlock.id] = s.id
@@ -76,6 +76,7 @@ class PathFinder:
                     #neighbourBlock.g = 1.4
                     # Byt till denna undre rad för fullständig A*
                     neighbourBlock.g = q.g + 1.4
+                    # add support for different ms on tiles
                 else:
                     #neighbourBlock.g = 1
                     # Byt till denna undre rad för fullständig A*
@@ -88,6 +89,8 @@ class PathFinder:
                 for i in closedList:
                     if (i.id == neighbourBlock.id and neighbourBlock.f >= i.f):
                         skip = True
+                if neighbourBlock.isFogged:
+                    skip = True
                 if skip is False:
                     # set q as parent to all neighbour blocks
                     self.backtrack[neighbourBlock.id] = q.id
@@ -140,6 +143,7 @@ class PathBlock:
     woodPile = 0
     hasWood = False
     isFogged = True
+    kilns = []
     def __init__(self, ID, adjacents, ms, hasTrees, walkable):
         self.id = ID
         self.adjacents = adjacents
