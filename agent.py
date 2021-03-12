@@ -97,13 +97,15 @@ class Agent:
             if self.type != enums.AgentType.KILNER:
                 self.Upgrade(enums.AgentType.KILNER)
                 return
-            else:
+            elif self.workPlace is not 0:
                 b = self.GetTouchingBlock()
-                if b is not self.hubBlock:
+                if b is not self.workPlace.block:
                     self.SetReturnPath()
                     return
                 else:
                     self.ChangeState(fsm.RunKilnState())
+            else:
+                print("looking for workplace")
 
         if self.goal == enums.GoalEnum.BUILD_KILNS_GOAL:
             if self.type != enums.AgentType.BUILDER:
