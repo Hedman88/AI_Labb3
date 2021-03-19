@@ -3,6 +3,12 @@ import agent, fsm, pathfinder, enums, random
 class Overlord:
     agents = []
     charcoal = 0
+    nrDisc = 0
+    nrKiln = 0
+    nrBuild = 0
+    nrIdleKilners = 0
+
+    kilns = []
 
     def SpawnAgents(self):
         maxAgents = 50
@@ -36,17 +42,37 @@ class Overlord:
                 self.agents[i].ChangeState(fsm.MoveState())
 
     def OperationCharcoal(self, nrDisc, nrKiln, nrBuild):
+        self.nrDisc = nrDisc
+        self.nrKiln = nrKiln
+        self.nrBuild = nrBuild
         for i in range(len(self.agents)):
             if i < nrDisc:
                 self.agents[i].SetGoal(enums.GoalEnum.DISCOVER_GOAL)
             elif i < nrDisc + nrKiln:
                 self.agents[i].SetGoal(enums.GoalEnum.KILN_GOAL)
+                self.nrIdleKilners += 1
             elif i < nrDisc + nrKiln + nrBuild:
                 self.agents[i].SetGoal(enums.GoalEnum.BUILD_KILNS_GOAL)
             else:
                 return
 
+    def SetKilnerToWorkplace(self, building):
+        if self.nrIdleKilners <= 0:
+            print("Need more kilners")
+        else:
+            for i in range(self.nrDisc, self.nrDisc + self.nrKiln):
+                if self.agents[i].workPlace == 0:
+                    self.agents[i].AddWorkPlace(self.kilns.pop())
+                    print("Added workplace to agent")
+                    return
+
     def AddCharcoal(self):
         self.charcoal += 1
+        print(self.charcoal)
+
+    def AddKiln(self, kiln):
+        self.kilns.append(kiln)
+        print("Added kiln to overlord")
+        self.SetKilnerToWorkplace(kiln)
 
 overlord = Overlord()

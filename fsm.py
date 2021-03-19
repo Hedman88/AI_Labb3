@@ -1,4 +1,4 @@
-import enums, pathfinder, random, buildings
+import enums, pathfinder, random, buildings, overlord
 
 class IdleState:
     def Execute(self, agent):
@@ -38,7 +38,7 @@ class WoodChoppingState:
     def Execute(self, agent):
         if agent.GetTouchingBlock().hasTrees:
             if agent.workTimer <= 0:
-                print("chopped tree")
+                #print("chopped tree")
                 agent.workTimer = 30
                 agent.GetTouchingBlock().RemoveTree()
                 agent.PickUpItem()
@@ -106,6 +106,8 @@ class ExploreState:
 
 class RunKilnState:
     def Execute(self, agent):
+        if len(agent.workPlace.block.kilns) < overlord.overlord.nrKiln:
+            return
         if agent.workTimer == 0:
             agent.workPlace.BurnWood()
             agent.workTimer = 30
@@ -121,9 +123,14 @@ class BuildState:
     def Execute(self, agent):
         if agent.workTimer == 0:
             b = agent.GetTouchingBlock()
-            b.kilns.append(buildings.Building(self.buildingType, b))
             for i in range(10):
                 b.TakeWood()
+
+            building = buildings.Building(self.buildingType, b)
+            b.kilns.append(building)
+            if building.type == enums.BuildingType.KILN_BUILDING:
+                overlord.overlord.AddKiln(building)
+
             agent.ChangeState(IdleState())
             print("KILN BUILT!!!!!")
         else:

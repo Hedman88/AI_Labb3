@@ -1,4 +1,4 @@
-import pygame, sys, mapreader, overlord, pathfinder, random, enums
+import pygame, pygame.freetype, sys, mapreader, overlord, pathfinder, random, enums
 from pygame.locals import *
 
 def StartPygame():
@@ -24,6 +24,9 @@ def StartPygame():
     treeRand = []
     for i in range(5):
         treeRand.append(random.randrange(3))
+
+    global hudFont
+    hudFont = pygame.freetype.SysFont("Arial", 24)
 
 def DrawMap():
     for i in range(len(maprows)):
@@ -55,6 +58,9 @@ def DrawBlocks():
 
     for key in blocks:
         b = blocks[key]
+        if len(b.kilns) > 0:
+            pygame.draw.rect(display, (200, 0, 200),
+                             ((b.id % 100) * rectSize, int(b.id / 100) * rectSize, rectSize, rectSize))
         if(b.hasTrees):
             pygame.draw.rect(display, (0, 50, 0), ((b.id%100) * rectSize, int(b.id/100) * rectSize, rectSize, rectSize))
             for i in range(b.trees):
@@ -93,6 +99,10 @@ def DrawAgents(agents):
         if agents[i].type == enums.AgentType.BUILDER:
             pygame.draw.rect(display, (255, 255, 255), (agents[i].posX, agents[i].posY, 3, 3))
 
+def DrawText(nrCharcoal):
+    string = "Charcoal: " + str(nrCharcoal)
+    hudFont.render_to(display, (10,10), string, (0,0,0))
+
 def Clear():
     display.fill((255,255,255))
     DrawMap()
@@ -101,6 +111,7 @@ def Update():
     Clear()
     DrawBlocks()
     DrawAgents(overlord.overlord.agents)
+    DrawText(overlord.overlord.charcoal)
     pygame.display.update()
     for event in pygame.event.get():
         if event.type == QUIT:

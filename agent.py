@@ -97,15 +97,17 @@ class Agent:
             if self.type != enums.AgentType.KILNER:
                 self.Upgrade(enums.AgentType.KILNER)
                 return
-            elif self.workPlace is not 0:
+            elif self.workPlace != 0:
                 b = self.GetTouchingBlock()
                 if b is not self.workPlace.block:
                     self.SetReturnPath()
                     return
                 else:
                     self.ChangeState(fsm.RunKilnState())
+                    return
             else:
-                print("looking for workplace")
+                #print("looking for workplace")
+                return
 
         if self.goal == enums.GoalEnum.BUILD_KILNS_GOAL:
             if self.type != enums.AgentType.BUILDER:
@@ -163,11 +165,11 @@ class Agent:
         self.path = pathfinder.pf.AStar(self.GetTouchingBlock(), self.hubBlock)
         #self.path = self.pathBack
         #self.pathBack = []
-        if self.path == None:
+        if self.path == type(None):
             print("Return path obstructed???")
             return
         self.ChangeState(fsm.MoveState())
-        print("return path set")
+        #print("return path set")
 
     def GetTouchingBlock(self):
         blockID = int(self.posY / 10) * 100 + (int(self.posX / 10))

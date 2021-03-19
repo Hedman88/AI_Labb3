@@ -143,7 +143,6 @@ class PathBlock:
     woodPile = 0
     hasWood = False
     isFogged = True
-    kilns = []
     def __init__(self, ID, adjacents, ms, hasTrees, walkable):
         self.id = ID
         self.adjacents = adjacents
@@ -152,6 +151,7 @@ class PathBlock:
         if(self.hasTrees):
             self.trees = 5
         self.walkable = walkable
+        self.kilns = []
 
     def IdToCoordinates(self):
         x = int(self.id % 100)
@@ -175,7 +175,7 @@ class PathBlock:
         if self.hasWood == False:
             self.hasWood = True
         self.woodPile += 1
-        print(self.id, "GOT WOOD")
+        #print(self.id, "GOT WOOD")
 
     def TakeWood(self):
         if self.hasWood:
