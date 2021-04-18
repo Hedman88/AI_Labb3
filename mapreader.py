@@ -10,7 +10,6 @@ def ReadMap(mapFileName):
 # Creating all map nodes and storing their IDs and neighbour IDs as ints
 # by taking Y-coordinate times 100 and adding the X-coordinate to that
 def InitMapBlocks():
-    print(len(maprows))
     for i in range(len(maprows)):
         for j in range(len(maprows[i]) - 1):
             selfID = i * 100 + j

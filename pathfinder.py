@@ -175,7 +175,6 @@ class PathBlock:
         if self.hasWood == False:
             self.hasWood = True
         self.woodPile += 1
-        #print(self.id, "GOT WOOD")
 
     def TakeWood(self):
         if self.hasWood:

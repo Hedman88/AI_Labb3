@@ -103,6 +103,10 @@ def DrawText(nrCharcoal):
     string = "Charcoal: " + str(nrCharcoal)
     hudFont.render_to(display, (10,10), string, (0,0,0))
 
+def DrawFinalTime(time):
+    string = "Final time: " + str(time) + " seconds"
+    hudFont.render_to(display, (10,30), string, (0,0,0))
+
 def Clear():
     display.fill((255,255,255))
     DrawMap()
@@ -112,6 +116,8 @@ def Update():
     DrawBlocks()
     DrawAgents(overlord.overlord.agents)
     DrawText(overlord.overlord.charcoal)
+    if overlord.overlord.objectiveCompleted:
+        DrawFinalTime(overlord.overlord.finalTime)
     pygame.display.update()
     for event in pygame.event.get():
         if event.type == QUIT:

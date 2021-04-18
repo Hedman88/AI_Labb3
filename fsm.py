@@ -38,17 +38,13 @@ class WoodChoppingState:
     def Execute(self, agent):
         if agent.GetTouchingBlock().hasTrees:
             if agent.workTimer <= 0:
-                #print("chopped tree")
                 agent.workTimer = 30
                 agent.GetTouchingBlock().RemoveTree()
                 agent.PickUpItem()
                 agent.SetReturnPath()
             else:
                 agent.workTimer -= 1
-                # if agent.woodChopTimer%5 == 0:
-                #     print(agent.woodChopTimer)
         else:
-            #print("This tile has no trees!!!")
             if(agent.goal == enums.GoalEnum.WOOD_GOAL):
                 agent.FindWood()
                 agent.ChangeState(MoveState())
@@ -60,8 +56,6 @@ class UpgradeState:
     def Execute(self, agent):
         if agent.upgradeTimer > 0:
             agent.upgradeTimer -= 1
-            # if agent.upgradeTimer%5 == 0:
-            #     print(agent.upgradeTimer)
         else:
             agent.type = self.upgradeType
             agent.ChangeState(IdleState())
@@ -112,7 +106,8 @@ class RunKilnState:
             agent.workPlace.BurnWood()
             agent.workTimer = 30
         elif agent.hubBlock.woodPile < 2:
-            print("Not enough wood to burn")
+            #print("Not enough wood to burn")
+            return
         else:
             agent.workTimer -= 1
 
@@ -132,6 +127,6 @@ class BuildState:
                 overlord.overlord.AddKiln(building)
 
             agent.ChangeState(IdleState())
-            print("KILN BUILT!!!!!")
+            print("Kiln built")
         else:
             agent.workTimer -= 1

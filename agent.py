@@ -1,4 +1,4 @@
-import fsm, pathfinder, enums
+import fsm, pathfinder, enums, overlord
 
 class Agent:
 
@@ -83,7 +83,8 @@ class Agent:
     def FindTask(self):
         if self.type == enums.AgentType.WORKER:
             if self.goal == enums.GoalEnum.WOOD_GOAL:
-                self.FindWood()
+                if overlord.overlord.foundWood:
+                    self.FindWood()
                 return
         if self.goal == enums.GoalEnum.DISCOVER_GOAL:
             if self.type != enums.AgentType.DISCOVERER:
@@ -106,7 +107,6 @@ class Agent:
                     self.ChangeState(fsm.RunKilnState())
                     return
             else:
-                #print("looking for workplace")
                 return
 
         if self.goal == enums.GoalEnum.BUILD_KILNS_GOAL:
@@ -129,7 +129,6 @@ class Agent:
         pathfinder.pf.Reset()
         self.path = pathfinder.pf.bfs(self.GetTouchingBlock())
         if self.path == None:
-            #print("No trees in sight")
             return
         self.ChangeState(fsm.MoveState())
 
@@ -139,7 +138,10 @@ class Agent:
             return
         b = self.GetTouchingBlock()
         for nID in b.adjacents:
-            pathfinder.paths.GetBlockByID(nID).Discover()
+            nBlock = pathfinder.paths.GetBlockByID(nID)
+            nBlock.Discover()
+            if nBlock.hasTrees:
+                overlord.overlord.foundWood = True
         bNeighbours = []
         bCoords = b.IdToCoordinates()
         bNeighbours.append((bCoords[1] - 1) * 100 + bCoords[0])         #N
@@ -169,7 +171,6 @@ class Agent:
             print("Return path obstructed???")
             return
         self.ChangeState(fsm.MoveState())
-        #print("return path set")
 
     def GetTouchingBlock(self):
         blockID = int(self.posY / 10) * 100 + (int(self.posX / 10))

@@ -1,4 +1,4 @@
-import mapreader, overlord
+import mapreader, overlord, time
 import pygamegui as gui
 
 

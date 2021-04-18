@@ -1,4 +1,4 @@
-import agent, fsm, pathfinder, enums, random
+import agent, fsm, pathfinder, enums, random, time
 
 class Overlord:
     agents = []
@@ -10,9 +10,15 @@ class Overlord:
 
     kilns = []
 
+    foundWood = False
+
+    objectiveCompleted = False
+    startTime = 0
+    finalTime = 0
+
     def SpawnAgents(self):
+        self.startTime = time.time()
         maxAgents = 50
-        print(len(pathfinder.paths.pathBlocks))
         startBlock = pathfinder.paths.GetNthBlock(random.randrange(9163))
         startBlock.Discover()
         i = 0
@@ -31,8 +37,9 @@ class Overlord:
 
 
     def UpdateAgents(self):
-        for i in range(len(self.agents)):
-            self.agents[i].Update()
+        if self.objectiveCompleted is False:
+            for i in range(len(self.agents)):
+                self.agents[i].Update()
 
     def GetWood(self):
         for i in range(len(self.agents)):
@@ -63,16 +70,16 @@ class Overlord:
             for i in range(self.nrDisc, self.nrDisc + self.nrKiln):
                 if self.agents[i].workPlace == 0:
                     self.agents[i].AddWorkPlace(self.kilns.pop())
-                    print("Added workplace to agent")
                     return
 
     def AddCharcoal(self):
         self.charcoal += 1
-        print(self.charcoal)
+        if self.charcoal >= 200 and self.objectiveCompleted is False:
+            self.objectiveCompleted = True
+            self.finalTime = time.time() - self.startTime
 
     def AddKiln(self, kiln):
         self.kilns.append(kiln)
-        print("Added kiln to overlord")
         self.SetKilnerToWorkplace(kiln)
 
 overlord = Overlord()
