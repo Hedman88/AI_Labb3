@@ -1,5 +1,5 @@
 import pygamegui as gui
-import time, math, random
+import math, random
 
 
 class PathFinder:
@@ -28,21 +28,14 @@ class PathFinder:
                     self.visited.append(neighbourBlock)
                     bfsQ.append(neighbourBlock)
                     self.backtrack[neighbourBlock.id] = s.id
-                    # neighbourBlock.prevBlockID = s.id
                     if (neighbourBlock.hasTrees):
                         self.path.append(neighbourBlock)
                         prevID = self.backtrack.get(neighbourBlock.id)
-                        #prevID = neighbourBlock.prevBlockID
                         while (prevID != 0):
                             prevBlock = paths.GetBlockByID(prevID)
                             self.path.append(prevBlock)
                             prevID = self.backtrack.get(prevBlock.id)
-                            #prevID = prevBlock.prevBlockID
                         return self.path
-            # gui.Clear()
-            # gui.DrawVisited(self.visited)
-            # gui.Update()
-            # time.sleep(0.01)
 
     def AStar(self, startBlock, goalBlock):
         self.backtrack[startBlock.id] = 0
@@ -73,13 +66,9 @@ class PathFinder:
                         #prevID = prevBlock.prevBlockID
                     return self.path
                 if (neighbourBlock.id % 100 != q.id % 100 and neighbourBlock.id / 100 != q.id / 100):
-                    #neighbourBlock.g = 1.4
-                    # Byt till denna undre rad för fullständig A*
                     neighbourBlock.g = q.g + 1.4
                     # add support for different ms on tiles
                 else:
-                    #neighbourBlock.g = 1
-                    # Byt till denna undre rad för fullständig A*
                     neighbourBlock.g = q.g + 1
                 neighbourBlock.h = self.Euclidean(neighbourID, goalBlock)
                 neighbourBlock.f = neighbourBlock.g + neighbourBlock.h
@@ -94,13 +83,8 @@ class PathFinder:
                 if skip is False:
                     # set q as parent to all neighbour blocks
                     self.backtrack[neighbourBlock.id] = q.id
-                    #neighbourBlock.prevBlockID = q.id
                     openList.append(neighbourBlock)
             closedList.append(q)
-            # gui.Clear()
-            # gui.DrawAStar(openList, closedList)
-            # gui.Update()
-            # time.sleep(0.01)
 
     # Following are different heuristics for testing purposes
     def Manhattan(self, currentID, goal):
