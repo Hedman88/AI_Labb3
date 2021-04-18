@@ -172,12 +172,6 @@ class Paths:
     pathBlocks = {}
     unwalkables = {}
 
-    def GetStart(self):
-        return self.pathBlocks.get("start")
-
-    def GetGoal(self):
-        return self.pathBlocks.get("goal")
-
     def GetBlockByID(self, ID):
         return self.pathBlocks.get(ID)
 

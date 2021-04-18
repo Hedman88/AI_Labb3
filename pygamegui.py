@@ -81,12 +81,6 @@ def DrawBlocks():
             pygame.draw.rect(display, (200, 200, 200),
                              ((b.id % 100) * rectSize, int(b.id / 100) * rectSize, rectSize, rectSize))
 
-def DrawPath(path):
-    for i in range(len(path)-1):
-        startPoint = (path[i].id%100 + 1)*(rectSize) - rectSize/2, (path[i].id/100 + 1)*(rectSize) - rectSize/2
-        endPoint = (path[i+1].id%100 + 1)*(rectSize) - rectSize/2, (path[i+1].id/100 + 1)*(rectSize) - rectSize/2
-        pygame.draw.line(display, (0,0,255), startPoint, endPoint, 3)
-
 def DrawAgents(agents):
     for i in range(len(agents)):
         point = (agents[i].posX, agents[i].posY)
